@@ -188,8 +188,8 @@ if needpos
     numdims = length(cfg.dim);
     if numdims == 2 || numdims == 3 % if 2D or 3D data
       % use spm_bwlabel for 2D/3D data to avoid usage of image processing toolbox
-      [posclusobs, posnum] = spm_bwlabel(tmp, 2*numdims);
-    else
+%       [posclusobs, posnum] = spm_bwlabel(tmp, 2*numdims); %KP commented
+%     else
       % use bwlabeln from the image processing toolbox
       posclusobs = bwlabeln(tmp, conndef(length(cfg.dim), 'min'));
     end
@@ -199,7 +199,13 @@ if needpos
     if false
       posclusobs = findcluster(reshape(postailobs, [cfg.dim,1]),cfg.chancmbneighbstructmat,cfg.chancmbneighbselmat,cfg.minnbchan);
     else
+        if isfield(cfg, 'KirstenFixesStuff')
+            cfg.dim = sum(cfg.inside);
+            channeighbstructmat = channeighbstructmat(cfg.inside,cfg.inside);
+            posclusobs = findcluster(reshape(postailobs, [cfg.dim,1]),channeighbstructmat,cfg.minnbchan);            
+        else
       posclusobs = findcluster(reshape(postailobs, [cfg.dim,1]),channeighbstructmat,cfg.minnbchan);
+        end
     end
     posclusobs = posclusobs(:);
   end % if channeighbstructmat
